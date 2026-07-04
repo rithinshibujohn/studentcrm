@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Student CRM{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/sb-admin-2.min.css' %}">
+</head>
+
+<body id="page-top">
+
+<div class="container mt-5">
+
+{% block content %}
+{% endblock %}
+
+</div>
+
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+</body>
+</html>

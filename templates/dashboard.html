@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Dashboard</h1>
+
+<p>Welcome, {{ request.user.first_name|default:request.user.username }}</p>
+
+<a href="{% url 'student_list' %}" class="btn btn-primary">
+    Manage Students
+</a>
+
+<form method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+        Logout
+    </button>
+</form>
+
+{% endblock %}
