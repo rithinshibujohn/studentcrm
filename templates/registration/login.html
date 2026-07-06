@@ -1,19 +1,73 @@
-{% block title %}Login{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student CRM Login</title>
 
-<h2>Student CRM Login</h2>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<form method="post">
+    <style>
+        body{
+            background:#f8f9fc;
+        }
 
-    {% csrf_token %}
+        .login-card{
+            max-width:420px;
+            margin:80px auto;
+        }
+    </style>
 
-    {{ form.as_p }}
+</head>
 
-    <button class="btn btn-primary">
-        Login
-    </button>
+<body>
 
-</form>
+<div class="container">
 
-{% endblock %}
+    <div class="card shadow login-card">
+
+        <div class="card-header text-center bg-primary text-white">
+            <h4 class="mb-0">Student CRM Login</h4>
+        </div>
+
+        <div class="card-body">
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    Invalid username or password.
+                </div>
+            {% endif %}
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Username</label>
+                    {{ form.username }}
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    {{ form.password }}
+                </div>
+
+                <button class="btn btn-primary btn-block">
+                    Login
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+document.getElementById("id_username").classList.add("form-control");
+document.getElementById("id_password").classList.add("form-control");
+</script>
+</body>
+
+</html>

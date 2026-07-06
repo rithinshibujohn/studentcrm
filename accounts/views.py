@@ -4,11 +4,18 @@ from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from students.models import Student
+
 
 # Create your views here.
 @login_required
 def dashboard(request):
-    return render(request, "dashboard.html")
+    context = {
+        "student_count": Student.objects.count(),
+        "user_count": User.objects.count(),
+        "recent_students": Student.objects.order_by("-created_at")[:5],
+    }
+    return render(request, "dashboard.html", context)
 
 
 from django.views.generic import (
