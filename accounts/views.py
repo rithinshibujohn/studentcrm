@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
@@ -58,3 +58,7 @@ class UserDetailView(LoginRequiredMixin,DetailView):
     model = User
     template_name = "accounts/user_detail.html"
     context_object_name = "user_obj"
+
+@login_required
+def profile(request):
+    return redirect("user_edit", pk=request.user.id)
