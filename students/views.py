@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
+from django.contrib import messages
 from django.views.generic import (
     ListView,
     CreateView,
@@ -11,6 +12,11 @@ from django.views.generic import (
 
 from .models import Student
 from .forms import StudentForm
+from .utils import import_students_from_excel
+from .excel_form import ExcelUploadForm
+from django.shortcuts import redirect, render
+from django.http import HttpResponse
+from .pdf import generate_student_pdf
 
 
 class StudentListView(LoginRequiredMixin, ListView):
@@ -53,9 +59,47 @@ class StudentDeleteView(LoginRequiredMixin,
 
     success_url = reverse_lazy("student_list")
 
+    def form_valid(self, form):
+        messages.success(self.request, "Student deleted successfully.")
+        return super().form_valid(form)
+
 
 class StudentDetailView(LoginRequiredMixin,
                         DetailView):
 
     model = Student
     template_name = "students/student_detail.html"
+
+
+
+def upload_students(request):
+
+    if request.method == "POST":
+        form = ExcelUploadForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            import_students_from_excel(request.FILES["file"])
+            messages.success(request, "Students imported successfully.")
+            return redirect("student_list")
+
+    else:
+        form = ExcelUploadForm()
+
+    return render(
+        request,
+        "students/upload_excel.html",
+        {"form": form},
+    )
+
+
+def download_pdf(request):
+
+    response = HttpResponse(content_type="application/pdf")
+
+    response["Content-Disposition"] = (
+        'attachment; filename="students.pdf"'
+    )
+
+    generate_student_pdf(response)
+
+    return response

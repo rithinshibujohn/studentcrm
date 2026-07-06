@@ -23,10 +23,28 @@
 
             <div class="container-fluid">
 
-                {% include "includes/messages.html" %}
-
+                {% if messages %}
+                
+                {% for message in messages %}
+                
+                <div class="alert alert-success alert-dismissible fade show">
+                
+                    {{ message }}
+                
+                    <button class="close" data-dismiss="alert">
+                
+                        &times;
+                
+                    </button>
+                
+                </div>
+                
+                {% endfor %}
+                
+                {% endif %}
                 {% block content %}
                 {% endblock %}
+                
 
             </div>
 

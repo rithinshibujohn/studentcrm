@@ -16,6 +16,18 @@ class StudentForm(forms.ModelForm):
         ]
 
         widgets = {
-            "dob": forms.DateInput(attrs={"type": "date"}),
-            "address": forms.Textarea(attrs={"rows": 3}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "phone": forms.TextInput(attrs={"class": "form-control"}),
+            "dob": forms.DateInput(attrs={
+                "class": "form-control",
+                "type": "date"
+            }),
+            "gender": forms.Select(attrs={"class": "form-control"}),
+            "address": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 3
+            }),
+            "course": forms.TextInput(attrs={"class": "form-control"}),
+            "photo": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }

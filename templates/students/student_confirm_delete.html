@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Student{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<div class="row justify-content-center">
+
+<div class="col-md-6">
+
+<div class="card shadow border-left-danger">
+
+<div class="card-header bg-danger text-white">
+
+<h5 class="mb-0">
+
+Delete Student
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<h4>
+
+Are you sure you want to delete
+
+<strong>{{ student.name }}</strong>?
+
+</h4>
+
+<p class="text-danger">
+
+This action cannot be undone.
+
+</p>
+
+<form method="post">
+
+{% csrf_token %}
+
+<button class="btn btn-danger">
+
+<i class="fas fa-trash"></i>
+
+Delete
+
+</button>
+
+<a href="{% url 'student_list' %}"
+
+class="btn btn-secondary">
+
+Cancel
+
+</a>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

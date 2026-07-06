@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Student Details{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 text-gray-800">Student Details</h1>
+
+        <a href="{% url 'student_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-3 text-center">
+
+                    {% if student.photo %}
+                        <img src="{{ student.photo.url }}"
+                             class="img-thumbnail"
+                             width="220">
+                    {% else %}
+                        <img src="https://via.placeholder.com/220x220?text=No+Photo"
+                             class="img-thumbnail">
+                    {% endif %}
+
+                </div>
+
+                <div class="col-md-9">
+
+                    <table class="table table-bordered">
+
+                        <tr>
+                            <th width="200">Name</th>
+                            <td>{{ student.name }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ student.email }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Phone</th>
+                            <td>{{ student.phone }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Date of Birth</th>
+                            <td>{{ student.dob }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Gender</th>
+                            <td>{{ student.gender }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Course</th>
+                            <td>{{ student.course }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Address</th>
+                            <td>{{ student.address }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Created At</th>
+                            <td>{{ student.created_at }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Updated At</th>
+                            <td>{{ student.updated_at }}</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

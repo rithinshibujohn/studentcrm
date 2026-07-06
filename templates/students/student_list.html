@@ -1,82 +1,129 @@
 {% extends "base.html" %}
 
+{% block title %}Students{% endblock %}
+
 {% block content %}
 
-<div class="d-flex justify-content-between mb-3">
-    <h2>Students</h2>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Students</h1>
 
-    <a href="{% url 'student_add' %}" class="btn btn-success">
+    <a href="{% url 'student_add' %}" class="btn btn-primary shadow-sm">
+        <i class="fas fa-plus fa-sm text-white-50"></i>
         Add Student
+    </a>
+    <a href="{% url 'upload_students' %}" class="btn btn-success">
+
+         Upload Excel
+
+    </a>
+    <a href="{% url 'download_pdf' %}" class="btn btn-danger">
+
+    Download PDF
+
     </a>
 </div>
 
-<table class="table table-bordered">
+<div class="card shadow mb-4">
 
-<thead>
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Student List
+        </h6>
+    </div>
 
-<tr>
+    <div class="card-body">
 
-<th>Name</th>
+        <div class="table-responsive">
 
-<th>Email</th>
+            <table class="table table-bordered table-hover">
 
-<th>Course</th>
+                <thead>
 
-<th>Action</th>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Course</th>
+                    <th width="220">Actions</th>
+                </tr>
 
-</tr>
+                </thead>
 
-</thead>
+                <tbody>
 
-<tbody>
+                {% for student in students %}
 
-{% for student in students %}
+                <tr>
 
-<tr>
+                    <td class="text-center">
 
-<td>{{ student.name }}</td>
+                        {% if student.photo %}
+                            <img src="{{ student.photo.url }}"
+                                 width="60"
+                                 height="60"
+                                 class="rounded-circle">
+                        {% else %}
+                            No Photo
+                        {% endif %}
 
-<td>{{ student.email }}</td>
+                    </td>
 
-<td>{{ student.course }}</td>
+                    <td>{{ student.name }}</td>
 
-<td>
+                    <td>{{ student.email }}</td>
 
-<a class="btn btn-info btn-sm"
-href="{% url 'student_detail' student.id %}">
-View
-</a>
+                    <td>{{ student.phone }}</td>
 
-<a class="btn btn-warning btn-sm"
-href="{% url 'student_edit' student.id %}">
-Edit
-</a>
+                    <td>{{ student.course }}</td>
 
-<a class="btn btn-danger btn-sm"
-href="{% url 'student_delete' student.id %}">
-Delete
-</a>
+                    <td>
 
-</td>
+                        <a href="{% url 'student_detail' student.id %}"
+                           class="btn btn-info btn-sm">
 
-</tr>
+                            <i class="fas fa-eye"></i>
 
-{% empty %}
+                        </a>
 
-<tr>
+                        <a href="{% url 'student_edit' student.id %}"
+                           class="btn btn-warning btn-sm">
 
-<td colspan="4">
+                            <i class="fas fa-edit"></i>
 
-No students found.
+                        </a>
 
-</td>
+                        <a href="{% url 'student_delete' student.id %}"
+                           class="btn btn-danger btn-sm">
 
-</tr>
+                            <i class="fas fa-trash"></i>
 
-{% endfor %}
+                        </a>
 
-</tbody>
+                    </td>
 
-</table>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="6" class="text-center">
+                        No Students Found
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}
