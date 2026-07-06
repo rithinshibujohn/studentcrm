@@ -2,19 +2,12 @@
 
 {% block content %}
 
-<h1>Dashboard</h1>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
 
-<p>Welcome, {{ request.user.first_name|default:request.user.username }}</p>
+    <h1 class="h3 mb-0 text-gray-800">
+        Dashboard
+    </h1>
 
-<a href="{% url 'student_list' %}" class="btn btn-primary">
-    Manage Students
-</a>
-
-<form method="post" action="{% url 'logout' %}" style="display:inline;">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">
-        Logout
-    </button>
-</form>
+</div>
 
 {% endblock %}

@@ -1,25 +1,45 @@
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% block title %}Student CRM{% endblock %}</title>
 
-    <link rel="stylesheet"
-          href="{% static 'css/sb-admin-2.min.css' %}">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% include "includes/head.html" %}
+
 </head>
 
 <body id="page-top">
 
-<div class="container mt-5">
+<div id="wrapper">
 
-{% block content %}
-{% endblock %}
+    {% include "includes/sidebar.html" %}
+
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <div id="content">
+
+            {% include "includes/topbar.html" %}
+
+            <div class="container-fluid">
+
+                {% include "includes/messages.html" %}
+
+                {% block content %}
+                {% endblock %}
+
+            </div>
+
+        </div>
+
+        {% include "includes/footer.html" %}
+
+    </div>
 
 </div>
 
-<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+{% include "includes/scripts.html" %}
 
 </body>
+
 </html>
