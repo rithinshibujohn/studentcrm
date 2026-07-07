@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}User{% endblock %}
+
+{% block content %}
+
+<h1 class="h3 mb-4 text-gray-800">
+
+    Profile
+
+</h1>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label>First Name</label>
+
+                    {{ form.first_name }}
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Last Name</label>
+
+                    {{ form.last_name }}
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Username</label>
+
+                    {{ form.username }}
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Email</label>
+
+                    {{ form.email }}
+
+                </div>
+
+            </div>
+            <div class="col-md-6 mb-3">
+                <button class="btn btn-success">
+            
+                    Update Profile
+            
+                </button>
+            
+                <a href="{% url 'user_list' %}" class="btn btn-secondary">
+            
+                    Cancel
+            
+                </a>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+
+                <label>Need to change your password?</label>
+                <br>
+                <a href="{% url 'change_password' %}" class="btn btn-outline-warning">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

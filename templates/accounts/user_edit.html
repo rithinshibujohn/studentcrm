@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}User{% endblock %}
+
+{% block content %}
+
+<h1 class="h3 mb-4 text-gray-800">
+
+    User Edit
+
+</h1>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label>First Name</label>
+
+                    {{ form.first_name }}
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Last Name</label>
+
+                    {{ form.last_name }}
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Username</label>
+
+                    {{ form.username }}
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Email</label>
+
+                    {{ form.email }}
+
+                </div>
+
+
+
+            </div>
+
+            <button class="btn btn-success">
+
+                Save
+
+            </button>
+
+            <a href="{% url 'user_list' %}" class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}

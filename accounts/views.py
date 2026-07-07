@@ -5,6 +5,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from students.models import Student
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth import update_session_auth_hash
+from django.views.generic import UpdateView
 
 
 # Create your views here.
@@ -25,7 +28,7 @@ from django.views.generic import (
     DetailView,
 )
 
-from .forms import UserForm
+from .forms import UserEditForm, UserForm, ProfileForm
 
 class UserListView(LoginRequiredMixin,ListView):
     model = User
@@ -47,14 +50,9 @@ class UserCreateView(LoginRequiredMixin,CreateView):
 
 class UserUpdateView(LoginRequiredMixin,UpdateView):
     model = User
-    form_class = UserForm
-    template_name = "accounts/user_form.html"
+    form_class = UserEditForm
+    template_name = "accounts/user_edit.html"
     success_url = reverse_lazy("user_list")
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields["password"].required = False
-        return form
 
     def form_valid(self, form):
         messages.success(self.request, "User updated successfully.")
@@ -69,3 +67,36 @@ class UserDetailView(LoginRequiredMixin,DetailView):
 @login_required
 def profile(request):
     return redirect("user_edit", pk=request.user.id)
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = "registration/change_password.html"
+    success_url = reverse_lazy("change_password")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        update_session_auth_hash(self.request, form.user)
+
+        messages.success(
+            self.request,
+            "Password changed successfully."
+        )
+
+        return response
+    
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = ProfileForm
+    template_name = "accounts/profile.html"
+    success_url = reverse_lazy("dashboard")
+
+    def get_object(self):
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.success(self.request, "Profile updated successfully.")
+        return super().form_valid(form)
+    
+    
+

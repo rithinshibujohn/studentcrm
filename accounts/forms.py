@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class UserForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
-        required=False,
+        required=True,
     )
 
     class Meta:
@@ -28,3 +28,38 @@ class UserForm(forms.ModelForm):
             user.save()
 
         return user
+
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+        ]
+
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "username": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+        }
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+        ]
+
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class":"form-control"}),
+            "last_name": forms.TextInput(attrs={"class":"form-control"}),
+            "username": forms.TextInput(attrs={"class":"form-control"}),
+            "email": forms.EmailInput(attrs={"class":"form-control"}),
+        }
