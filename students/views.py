@@ -17,7 +17,8 @@ from .excel_form import ExcelUploadForm
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from .pdf import generate_student_pdf
-
+from django.conf import settings
+import os
 
 class StudentListView(LoginRequiredMixin, ListView):
     model = Student
@@ -103,3 +104,15 @@ def download_pdf(request):
     generate_student_pdf(response)
 
     return response
+
+
+def media_test(request):
+    media_root = settings.MEDIA_ROOT
+    files = []
+
+    if os.path.exists(media_root):
+        for root, dirs, filenames in os.walk(media_root):
+            for f in filenames:
+                files.append(os.path.join(root, f))
+
+    return HttpResponse("<br>".join(files) if files else "No files found")

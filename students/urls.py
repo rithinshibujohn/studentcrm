@@ -12,4 +12,5 @@ urlpatterns = [
     path("<int:pk>/delete/", views.StudentDeleteView.as_view(), name="student_delete"),
     path("upload/", views.upload_students, name="upload_students"),
     path("pdf/", views.download_pdf, name="download_pdf"),
+    path("media-test/", views.media_test, name="media_test"),
 ]
