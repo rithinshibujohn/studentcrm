@@ -14,80 +14,566 @@
         </a>
     </div>
 
-    <div class="card shadow">
+    <form method="post" enctype="multipart/form-data">
 
-        <div class="card-body">
+        {% csrf_token %}
 
-            <form method="post" enctype="multipart/form-data">
+        <!-- ================= STUDENT DETAILS ================= -->
 
-                {% csrf_token %}
+        <div class="card shadow mb-4">
+
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    Student Details
+                </h6>
+            </div>
+
+            <div class="card-body">
 
                 <div class="row">
 
                     <div class="col-md-6 mb-3">
                         <label>Name</label>
                         {{ form.name }}
-                        <small class="text-danger">{{ form.name.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.name.errors }}
+                        </small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Email</label>
                         {{ form.email }}
-                        <small class="text-danger">{{ form.email.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.email.errors }}
+                        </small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Phone</label>
                         {{ form.phone }}
-                        <small class="text-danger">{{ form.phone.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.phone.errors }}
+                        </small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Date of Birth</label>
                         {{ form.dob }}
-                        <small class="text-danger">{{ form.dob.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.dob.errors }}
+                        </small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Gender</label>
                         {{ form.gender }}
-                        <small class="text-danger">{{ form.gender.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.gender.errors }}
+                        </small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Course</label>
                         {{ form.course }}
-                        <small class="text-danger">{{ form.course.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.course.errors }}
+                        </small>
                     </div>
 
                     <div class="col-md-12 mb-3">
                         <label>Address</label>
                         {{ form.address }}
-                        <small class="text-danger">{{ form.address.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.address.errors }}
+                        </small>
                     </div>
 
                     <div class="col-md-12 mb-3">
                         <label>Photo</label>
                         {{ form.photo }}
-                        <small class="text-danger">{{ form.photo.errors }}</small>
+                        <small class="text-danger">
+                            {{ form.photo.errors }}
+                        </small>
                     </div>
 
                 </div>
 
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Save Student
-                </button>
+            </div>
+        </div>
 
-                <a href="{% url 'student_list' %}" class="btn btn-secondary">
-                    Cancel
-                </a>
 
-            </form>
+        <!-- ================= EDUCATION DETAILS ================= -->
+
+        <div class="card shadow mb-4">
+
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+
+                <h6 class="m-0 font-weight-bold text-primary">
+                    Education Details
+                </h6>
+
+               
+            </div>
+
+            <div class="card-body">
+
+                {{ education_formset.management_form }}
+
+                <div id="education-container">
+
+                    {% for education_form in education_formset %}
+
+                    <div class="education-row border rounded p-3 mb-3">
+
+                        {{ education_form.id }}
+                        <div style="display: none;">
+                            {{ education_form.DELETE }}
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-3">
+                                <label>Qualification</label>
+                                {{ education_form.qualification }}
+                                <small class="text-danger">
+                                    {{ education_form.qualification.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Institution</label>
+                                {{ education_form.institution }}
+                                <small class="text-danger">
+                                    {{ education_form.institution.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Year</label>
+                                {{ education_form.year }}
+                                <small class="text-danger">
+                                    {{ education_form.year.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Percentage</label>
+                                {{ education_form.percentage }}
+                                <small class="text-danger">
+                                    {{ education_form.percentage.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-2 d-flex align-items-end">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger remove-education w-100">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                    <div id="education-empty-form" style="display: none;">
+                        <div class="education-row border rounded p-3 mb-3">
+                    
+                            {{ education_formset.empty_form.id }}
+                    
+                            <div style="display: none;">
+                                {{ education_formset.empty_form.DELETE }}
+                            </div>
+                    
+                            <div class="row">
+                    
+                                <div class="col-md-3">
+                                    <label>Qualification</label>
+                                    {{ education_formset.empty_form.qualification }}
+                                </div>
+                    
+                                <div class="col-md-3">
+                                    <label>Institution</label>
+                                    {{ education_formset.empty_form.institution }}
+                                </div>
+                    
+                                <div class="col-md-2">
+                                    <label>Year</label>
+                                    {{ education_formset.empty_form.year }}
+                                </div>
+                    
+                                <div class="col-md-2">
+                                    <label>Percentage</label>
+                                    {{ education_formset.empty_form.percentage }}
+                                </div>
+                    
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger remove-education w-100">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                    
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="text-right mt-3">
+                    <button type="button" class="btn btn-primary btn-sm" id="add-education">
+                        <i class="fas fa-plus"></i> Add More
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ================= COURSE ENROLLMENTS ================= -->
+
+        <div class="card shadow mb-4">
+
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+
+                <h6 class="m-0 font-weight-bold text-primary">
+                    Course Enrollments
+                </h6>
+
+                
+
+            </div>
+
+            <div class="card-body">
+
+                {{ enrollment_formset.management_form }}
+
+                <div id="enrollment-container">
+
+                    {% for enrollment_form in enrollment_formset %}
+
+                    <div class="enrollment-row border rounded p-3 mb-3">
+
+                        {{ enrollment_form.id }}
+                        <div style="display: none;">
+                            {{ enrollment_form.DELETE }}
+                        </div>
+                        
+
+                        <div class="row">
+
+                            <div class="col-md-3">
+                                <label>Course</label>
+                                {{ enrollment_form.course }}
+                                <small class="text-danger">
+                                    {{ enrollment_form.course.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>Start Date</label>
+                                {{ enrollment_form.start_date }}
+                                <small class="text-danger">
+                                    {{ enrollment_form.start_date.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Fee</label>
+                                {{ enrollment_form.fee }}
+                                <small class="text-danger">
+                                    {{ enrollment_form.fee.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Status</label>
+                                {{ enrollment_form.status }}
+                                <small class="text-danger">
+                                    {{ enrollment_form.status.errors }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-2 d-flex align-items-end">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger remove-enrollment w-100">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                    <div id="enrollment-empty-form" style="display: none;">
+                        <div class="enrollment-row border rounded p-3 mb-3">
+                    
+                            {{ enrollment_formset.empty_form.id }}
+                    
+                            <div style="display: none;">
+                                {{ enrollment_formset.empty_form.DELETE }}
+                            </div>
+                    
+                            <div class="row">
+                    
+                                <div class="col-md-3">
+                                    <label>Course</label>
+                                    {{ enrollment_formset.empty_form.course }}
+                                </div>
+                    
+                                <div class="col-md-3">
+                                    <label>Start Date</label>
+                                    {{ enrollment_formset.empty_form.start_date }}
+                                </div>
+                    
+                                <div class="col-md-2">
+                                    <label>Fee</label>
+                                    {{ enrollment_formset.empty_form.fee }}
+                                </div>
+                    
+                                <div class="col-md-2">
+                                    <label>Status</label>
+                                    {{ enrollment_formset.empty_form.status }}
+                                </div>
+                    
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger remove-enrollment w-100">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                    
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="text-right mt-3">
+                    <button type="button" class="btn btn-primary btn-sm" id="add-enrollment">
+                        <i class="fas fa-plus"></i> Add More
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ================= BUTTONS ================= -->
+
+        <div class="mb-4">
+
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i> Save Student
+            </button>
+
+            <a
+                href="{% url 'student_list' %}"
+                class="btn btn-secondary">
+                Cancel
+            </a>
 
         </div>
 
-    </div>
+    </form>
 
 </div>
+
+
+<!-- ========================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // ========================================================
+    // EDUCATION
+    // ========================================================
+
+    const educationContainer =
+        document.getElementById("education-container");
+
+    const addEducationButton =
+        document.getElementById("add-education");
+
+    const educationTotalForms =
+        document.getElementById("id_education-TOTAL_FORMS");
+
+
+    addEducationButton.addEventListener("click", function () {
+
+    const formCount = parseInt(educationTotalForms.value);
+
+    const emptyForm =
+        document.getElementById("education-empty-form");
+
+    let newRow = emptyForm.innerHTML;
+
+    newRow = newRow.replace(
+        /__prefix__/g,
+        formCount
+    );
+
+    educationContainer.insertAdjacentHTML(
+        "beforeend",
+        newRow
+    );
+
+    educationTotalForms.value = formCount + 1;
+
+});
+
+    educationContainer.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !event.target.closest(".remove-education")
+            ) {
+                return;
+            }
+
+            const row =
+                event.target.closest(".education-row");
+
+            const deleteField =
+                row.querySelector(
+                    'input[name$="-DELETE"]'
+                );
+
+            const idField =
+                row.querySelector(
+                    'input[name$="-id"]'
+                );
+
+            /*
+             * Existing database record
+             */
+            if (
+                idField &&
+                idField.value
+            ) {
+
+                deleteField.checked = true;
+
+                row.style.display = "none";
+
+            }
+
+            /*
+             * Newly added record
+             */
+            else {
+
+                row.remove();
+
+            }
+
+        }
+    );
+
+
+    // ========================================================
+    // COURSE ENROLLMENTS
+    // ========================================================
+
+    const enrollmentContainer =
+        document.getElementById("enrollment-container");
+
+    const addEnrollmentButton =
+        document.getElementById("add-enrollment");
+
+    const enrollmentTotalForms =
+        document.getElementById(
+            "id_enrollment-TOTAL_FORMS"
+        );
+
+
+    addEnrollmentButton.addEventListener(
+        "click",
+        function () {
+
+            const formCount =
+                parseInt(enrollmentTotalForms.value);
+
+            const emptyForm =
+                document.getElementById("enrollment-empty-form");
+
+            let newRow = emptyForm.innerHTML;
+
+            newRow = newRow.replace(
+                /__prefix__/g,
+                formCount
+            );
+
+            enrollmentContainer.insertAdjacentHTML(
+                "beforeend",
+                newRow
+            );
+
+            enrollmentTotalForms.value =
+                formCount + 1;
+
+        }
+    );
+
+
+    enrollmentContainer.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !event.target.closest(".remove-enrollment")
+            ) {
+                return;
+            }
+
+            const row =
+                event.target.closest(".enrollment-row");
+
+            const deleteField =
+                row.querySelector(
+                    'input[name$="-DELETE"]'
+                );
+
+            const idField =
+                row.querySelector(
+                    'input[name$="-id"]'
+                );
+
+            /*
+             * Existing database record
+             */
+            if (
+                idField &&
+                idField.value
+            ) {
+
+                deleteField.checked = true;
+
+                row.style.display = "none";
+
+            }
+
+            /*
+             * Newly added record
+             */
+            else {
+
+                row.remove();
+
+            }
+
+        }
+    );
+
+});
+
+</script>
 
 {% endblock %}

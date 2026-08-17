@@ -23,3 +23,48 @@ class Student(models.Model):
 
     def __str__(self):
         return self.name
+
+class EducationDetail(models.Model):
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="education_details"
+    )
+    qualification = models.CharField(max_length=100)
+    institution = models.CharField(max_length=200)
+    year = models.PositiveIntegerField()
+    percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2
+    )
+
+    def __str__(self):
+        return f"{self.student.name} - {self.qualification}"
+
+
+class CourseEnrollment(models.Model):
+    STATUS_CHOICES = [
+        ("Active", "Active"),
+        ("Completed", "Completed"),
+        ("Cancelled", "Cancelled"),
+    ]
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="course_enrollments"
+    )
+    course = models.CharField(max_length=100)
+    start_date = models.DateField()
+    fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="Active"
+    )
+
+    def __str__(self):
+        return f"{self.student.name} - {self.course}"
