@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Course{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            <h5 class="m-0 font-weight-bold text-danger">
+                Delete Course
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+                Are you sure you want to delete
+                <strong>{{ object.name }}</strong>?
+            </p>
+
+            <p class="text-danger">
+                This will also delete all subjects belonging
+                to this course.
+            </p>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="btn btn-danger">
+
+                    <i class="fas fa-trash"></i>
+                    Yes, Delete
+
+                </button>
+
+                <a href="{% url 'course_list' %}"
+                   class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

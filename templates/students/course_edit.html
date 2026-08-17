@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Course{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+        <h1 class="h3 mb-0 text-gray-800">
+            Edit Course
+        </h1>
+
+        <a href="{% url 'course_list' %}"
+           class="btn btn-secondary">
+
+            <i class="fas fa-arrow-left"></i>
+            Back
+
+        </a>
+
+    </div>
+
+
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <!-- Course Details -->
+
+                <h5 class="font-weight-bold text-primary mb-3">
+                    Course Details
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Course Name</label>
+
+                        {{ form.name }}
+
+                        <small class="text-danger">
+                            {{ form.name.errors }}
+                        </small>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label>Duration (Months)</label>
+
+                        {{ form.duration_months }}
+
+                        <small class="text-danger">
+                            {{ form.duration_months.errors }}
+                        </small>
+
+                    </div>
+
+
+                    <div class="col-md-12 mb-3">
+
+                        <label>Description</label>
+
+                        {{ form.description }}
+
+                        <small class="text-danger">
+                            {{ form.description.errors }}
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <hr>
+
+
+                <!-- Subjects -->
+
+                <h5 class="font-weight-bold text-primary mb-3">
+                    Subjects
+                </h5>
+
+
+                {{ subject_formset.management_form }}
+
+
+                <div id="subject-container">
+
+                    {% for subject_form in subject_formset %}
+
+                    <div class="subject-row border rounded p-3 mb-3">
+
+                        {{ subject_form.id }}
+
+                        <div style="display: none;">
+                            {{ subject_form.DELETE }}
+                        </div>
+
+
+                        <div class="row">
+
+                            <div class="col-md-4 mb-3">
+
+                                <label>
+                                    Subject Name
+                                </label>
+
+                                {{ subject_form.name }}
+
+                                <small class="text-danger">
+                                    {{ subject_form.name.errors }}
+                                </small>
+
+                            </div>
+
+
+                            <div class="col-md-3 mb-3">
+
+                                <label>
+                                    Start Date
+                                </label>
+
+                                {{ subject_form.start_date }}
+
+                                <small class="text-danger">
+                                    {{ subject_form.start_date.errors }}
+                                </small>
+
+                            </div>
+
+
+                            <div class="col-md-3 mb-3">
+
+                                <label>
+                                    End Date
+                                </label>
+
+                                {{ subject_form.end_date }}
+
+                                <small class="text-danger">
+                                    {{ subject_form.end_date.errors }}
+                                </small>
+
+                            </div>
+
+
+                            <div class="col-md-2 d-flex align-items-end mb-3">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger remove-subject w-100">
+
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- Empty Subject Template -->
+
+                <div id="subject-empty-form"
+                     style="display: none;">
+
+                    <div class="subject-row border rounded p-3 mb-3">
+
+                        {{ subject_formset.empty_form.id }}
+
+                        <div style="display: none;">
+                            {{ subject_formset.empty_form.DELETE }}
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-4 mb-3">
+
+                                <label>
+                                    Subject Name
+                                </label>
+
+                                {{ subject_formset.empty_form.name }}
+
+                            </div>
+
+
+                            <div class="col-md-3 mb-3">
+
+                                <label>
+                                    Start Date
+                                </label>
+
+                                {{ subject_formset.empty_form.start_date }}
+
+                            </div>
+
+
+                            <div class="col-md-3 mb-3">
+
+                                <label>
+                                    End Date
+                                </label>
+
+                                {{ subject_formset.empty_form.end_date }}
+
+                            </div>
+
+
+                            <div class="col-md-2 d-flex align-items-end mb-3">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger remove-subject w-100">
+
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Add Subject -->
+
+                <div class="text-right mb-4">
+
+                    <button
+                        type="button"
+                        id="add-subject"
+                        class="btn btn-primary btn-sm">
+
+                        <i class="fas fa-plus"></i>
+                        Add More Subject
+
+                    </button>
+
+                </div>
+
+
+                <hr>
+
+
+                <!-- Buttons -->
+
+                <button
+                    type="submit"
+                    class="btn btn-success">
+
+                    <i class="fas fa-save"></i>
+                    Save Changes
+
+                </button>
+
+
+                <a
+                    href="{% url 'course_list' %}"
+                    class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addSubjectButton =
+        document.getElementById("add-subject");
+
+    const subjectContainer =
+        document.getElementById("subject-container");
+
+    const subjectTotalForms =
+        document.getElementById(
+            "id_subjects-TOTAL_FORMS"
+        );
+
+
+    /*
+     * ADD MORE SUBJECT
+     */
+
+    addSubjectButton.addEventListener(
+        "click",
+        function () {
+
+            const formCount =
+                parseInt(subjectTotalForms.value);
+
+            const emptyForm =
+                document.getElementById(
+                    "subject-empty-form"
+                );
+
+            let newRow =
+                emptyForm.innerHTML;
+
+
+            newRow =
+                newRow.replace(
+                    /__prefix__/g,
+                    formCount
+                );
+
+
+            subjectContainer.insertAdjacentHTML(
+                "beforeend",
+                newRow
+            );
+
+
+            subjectTotalForms.value =
+                formCount + 1;
+
+        }
+    );
+
+
+    /*
+     * DELETE SUBJECT
+     */
+
+    subjectContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const deleteButton =
+                event.target.closest(
+                    ".remove-subject"
+                );
+
+
+            if (!deleteButton) {
+                return;
+            }
+
+
+            const row =
+                deleteButton.closest(
+                    ".subject-row"
+                );
+
+
+            const deleteField =
+                row.querySelector(
+                    'input[name$="-DELETE"]'
+                );
+
+
+            const idField =
+                row.querySelector(
+                    'input[name$="-id"]'
+                );
+
+
+            /*
+             * Existing subject
+             */
+
+            if (
+                idField &&
+                idField.value
+            ) {
+
+                deleteField.checked = true;
+
+                row.style.display = "none";
+
+            }
+
+
+            /*
+             * Newly added subject
+             */
+
+            else {
+
+                row.remove();
+
+            }
+
+        }
+    );
+
+});
+
+</script>
+
+{% endblock %}

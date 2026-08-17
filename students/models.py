@@ -68,3 +68,25 @@ class CourseEnrollment(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.course}"
+
+class Course(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    duration_months = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
+
+
+class Subject(models.Model):
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="subjects"
+    )
+    name = models.CharField(max_length=200)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __str__(self):
+        return f"{self.course.name} - {self.name}"

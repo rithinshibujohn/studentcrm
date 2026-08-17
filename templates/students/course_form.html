@@ -1,0 +1,690 @@
+{% extends "base.html" %}
+
+{% block title %}Course Master{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+        <h1 class="h3 mb-0 text-gray-800">
+            Course Master
+        </h1>
+
+        <a href="{% url 'course_list' %}"
+           class="btn btn-secondary">
+
+            <i class="fas fa-arrow-left"></i>
+            Back
+
+        </a>
+
+    </div>
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <!-- Course Formset Management -->
+        {{ course_formset.management_form }}
+
+
+        <!-- Courses Container -->
+
+        <div id="course-container">
+
+            {% for course_form in course_formset %}
+
+            <div class="course-row card shadow mb-4">
+
+                <div class="card-header d-flex justify-content-between align-items-center">
+
+                    <h5 class="m-0 font-weight-bold text-primary">
+                        Course
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-sm remove-course">
+
+                        <i class="fas fa-trash"></i>
+                        Remove Course
+
+                    </button>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <!-- Course Fields -->
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>Course Name</label>
+
+                            {{ course_form.name }}
+
+                            <small class="text-danger">
+                                {{ course_form.name.errors }}
+                            </small>
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>Duration (Months)</label>
+
+                            {{ course_form.duration_months }}
+
+                            <small class="text-danger">
+                                {{ course_form.duration_months.errors }}
+                            </small>
+
+                        </div>
+
+
+                        <div class="col-md-12 mb-3">
+
+                            <label>Description</label>
+
+                            {{ course_form.description }}
+
+                            <small class="text-danger">
+                                {{ course_form.description.errors }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <!-- Subjects -->
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <h5 class="font-weight-bold text-primary mb-0">
+                            Subjects
+                        </h5>
+
+                    </div>
+
+
+                    <div
+                        class="subject-container"
+                        data-course-index="{{ forloop.counter0 }}">
+
+                        <!-- Initial Subject -->
+
+                        <div class="subject-row border rounded p-3 mb-3">
+
+                            <div class="row">
+
+                                <div class="col-md-4 mb-3">
+
+                                    <label>Subject Name</label>
+
+                                    <input
+                                        type="text"
+                                        name="subjects-{{ forloop.counter0 }}-0-name"
+                                        class="form-control"
+                                        placeholder="Subject Name">
+
+                                </div>
+
+
+                                <div class="col-md-3 mb-3">
+
+                                    <label>Start Date</label>
+
+                                    <input
+                                        type="date"
+                                        name="subjects-{{ forloop.counter0 }}-0-start_date"
+                                        class="form-control">
+
+                                </div>
+
+
+                                <div class="col-md-3 mb-3">
+
+                                    <label>End Date</label>
+
+                                    <input
+                                        type="date"
+                                        name="subjects-{{ forloop.counter0 }}-0-end_date"
+                                        class="form-control">
+
+                                </div>
+
+
+                                <div class="col-md-2 d-flex align-items-end mb-3">
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger remove-subject w-100">
+
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Subject Management Count -->
+
+                    <input
+                        type="hidden"
+                        class="subject-total-forms"
+                        name="subjects-{{ forloop.counter0 }}-TOTAL_FORMS"
+                        value="1">
+
+                    <input
+                        type="hidden"
+                        name="subjects-{{ forloop.counter0 }}-INITIAL_FORMS"
+                        value="0">
+
+
+                    <!-- Add Subject -->
+
+                    <div class="text-right">
+
+                        <button
+                            type="button"
+                            class="btn btn-primary btn-sm add-subject">
+
+                            <i class="fas fa-plus"></i>
+                            Add More Subject
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- Empty Course Template -->
+
+        <div id="empty-course" style="display: none;">
+
+            <div class="course-row card shadow mb-4">
+
+                <div class="card-header d-flex justify-content-between align-items-center">
+
+                    <h5 class="m-0 font-weight-bold text-primary">
+                        Course
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-sm remove-course">
+
+                        <i class="fas fa-trash"></i>
+                        Remove Course
+
+                    </button>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>Course Name</label>
+
+                            <input
+                                type="text"
+                                name="courses-__prefix__-name"
+                                class="form-control"
+                                placeholder="Course Name">
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label>Duration (Months)</label>
+
+                            <input
+                                type="number"
+                                name="courses-__prefix__-duration_months"
+                                class="form-control"
+                                min="1">
+
+                        </div>
+
+
+                        <div class="col-md-12 mb-3">
+
+                            <label>Description</label>
+
+                            <textarea
+                                name="courses-__prefix__-description"
+                                class="form-control"
+                                rows="3"></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <h5 class="font-weight-bold text-primary mb-3">
+                        Subjects
+                    </h5>
+
+
+                    <div
+                        class="subject-container"
+                        data-course-index="__prefix__">
+
+                        <div class="subject-row border rounded p-3 mb-3">
+
+                            <div class="row">
+
+                                <div class="col-md-4 mb-3">
+
+                                    <label>Subject Name</label>
+
+                                    <input
+                                        type="text"
+                                        name="subjects-__prefix__-0-name"
+                                        class="form-control"
+                                        placeholder="Subject Name">
+
+                                </div>
+
+
+                                <div class="col-md-3 mb-3">
+
+                                    <label>Start Date</label>
+
+                                    <input
+                                        type="date"
+                                        name="subjects-__prefix__-0-start_date"
+                                        class="form-control">
+
+                                </div>
+
+
+                                <div class="col-md-3 mb-3">
+
+                                    <label>End Date</label>
+
+                                    <input
+                                        type="date"
+                                        name="subjects-__prefix__-0-end_date"
+                                        class="form-control">
+
+                                </div>
+
+
+                                <div class="col-md-2 d-flex align-items-end mb-3">
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger remove-subject w-100">
+
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <input
+                        type="hidden"
+                        class="subject-total-forms"
+                        name="subjects-__prefix__-TOTAL_FORMS"
+                        value="1">
+
+                    <input
+                        type="hidden"
+                        name="subjects-__prefix__-INITIAL_FORMS"
+                        value="0">
+
+
+                    <div class="text-right">
+
+                        <button
+                            type="button"
+                            class="btn btn-primary btn-sm add-subject">
+
+                            <i class="fas fa-plus"></i>
+                            Add More Subject
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Add More Course -->
+
+        <div class="text-right mb-4">
+
+            <button
+                type="button"
+                id="add-course"
+                class="btn btn-primary">
+
+                <i class="fas fa-plus"></i>
+                Add More Course
+
+            </button>
+
+        </div>
+
+
+        <!-- Save -->
+
+        <button
+            type="submit"
+            class="btn btn-success">
+
+            <i class="fas fa-save"></i>
+            Save Courses
+
+        </button>
+
+
+        <a
+            href="{% url 'course_list' %}"
+            class="btn btn-secondary">
+
+            Cancel
+
+        </a>
+
+    </form>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const courseContainer =
+        document.getElementById("course-container");
+
+    const addCourseButton =
+        document.getElementById("add-course");
+
+    const courseTotalForms =
+        document.getElementById(
+            "id_courses-TOTAL_FORMS"
+        );
+
+
+    /*
+     * ADD MORE COURSE
+     */
+
+    addCourseButton.addEventListener(
+        "click",
+        function () {
+
+            const courseIndex =
+                parseInt(courseTotalForms.value);
+
+            const emptyCourse =
+                document.getElementById(
+                    "empty-course"
+                );
+
+            let newCourse =
+                emptyCourse.innerHTML;
+
+
+            newCourse =
+                newCourse.replace(
+                    /__prefix__/g,
+                    courseIndex
+                );
+
+
+            courseContainer.insertAdjacentHTML(
+                "beforeend",
+                newCourse
+            );
+
+
+            courseTotalForms.value =
+                courseIndex + 1;
+
+        }
+    );
+
+
+    /*
+     * ADD MORE SUBJECT
+     */
+
+    courseContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const addButton =
+                event.target.closest(
+                    ".add-subject"
+                );
+
+
+            if (!addButton) {
+                return;
+            }
+
+
+            const courseRow =
+                addButton.closest(
+                    ".course-row"
+                );
+
+
+            const subjectContainer =
+                courseRow.querySelector(
+                    ".subject-container"
+                );
+
+
+            const totalForms =
+                courseRow.querySelector(
+                    ".subject-total-forms"
+                );
+
+
+            const courseIndex =
+                subjectContainer.dataset.courseIndex;
+
+
+            const subjectIndex =
+                parseInt(totalForms.value);
+
+
+            const subjectHTML = `
+
+                <div class="subject-row border rounded p-3 mb-3">
+
+                    <div class="row">
+
+                        <div class="col-md-4 mb-3">
+
+                            <label>
+                                Subject Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="subjects-${courseIndex}-${subjectIndex}-name"
+                                class="form-control"
+                                placeholder="Subject Name">
+
+                        </div>
+
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>
+                                Start Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="subjects-${courseIndex}-${subjectIndex}-start_date"
+                                class="form-control">
+
+                        </div>
+
+
+                        <div class="col-md-3 mb-3">
+
+                            <label>
+                                End Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="subjects-${courseIndex}-${subjectIndex}-end_date"
+                                class="form-control">
+
+                        </div>
+
+
+                        <div class="col-md-2 d-flex align-items-end mb-3">
+
+                            <button
+                                type="button"
+                                class="btn btn-danger remove-subject w-100">
+
+                                <i class="fas fa-trash"></i>
+                                Delete
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            subjectContainer.insertAdjacentHTML(
+                "beforeend",
+                subjectHTML
+            );
+
+
+            totalForms.value =
+                subjectIndex + 1;
+
+        }
+    );
+
+
+    /*
+     * DELETE SUBJECT
+     */
+
+    courseContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const deleteButton =
+                event.target.closest(
+                    ".remove-subject"
+                );
+
+
+            if (!deleteButton) {
+                return;
+            }
+
+
+            const subjectRow =
+                deleteButton.closest(
+                    ".subject-row"
+                );
+
+
+            subjectRow.remove();
+
+        }
+    );
+
+
+    /*
+     * DELETE COURSE
+     */
+
+    courseContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const deleteButton =
+                event.target.closest(
+                    ".remove-course"
+                );
+
+
+            if (!deleteButton) {
+                return;
+            }
+
+
+            const courseRow =
+                deleteButton.closest(
+                    ".course-row"
+                );
+
+
+            courseRow.remove();
+
+        }
+    );
+
+});
+
+</script>
+
+{% endblock %}

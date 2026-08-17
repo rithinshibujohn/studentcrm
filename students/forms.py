@@ -5,6 +5,8 @@ from .models import (
     Student,
     EducationDetail,
     CourseEnrollment,
+    Course,
+    Subject
 )
 
 
@@ -139,4 +141,81 @@ CourseEnrollmentFormSet = inlineformset_factory(
     form=CourseEnrollmentForm,
     extra=1,
     can_delete=True,
+)
+
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = [
+            "name",
+            "description",
+            "duration_months",
+        ]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Course Name",
+                }
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Course Description",
+                }
+            ),
+            "duration_months": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "1",
+                    "placeholder": "Duration in months",
+                }
+            ),
+        }
+
+
+class SubjectForm(forms.ModelForm):
+    class Meta:
+        model = Subject
+        fields = [
+            "name",
+            "start_date",
+            "end_date",
+        ]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Subject Name",
+                }
+            ),
+            "start_date": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                }
+            ),
+            "end_date": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                }
+            ),
+        }
+
+SubjectFormSet = forms.inlineformset_factory(
+    Course,
+    Subject,
+    form=SubjectForm,
+    extra=1,
+    can_delete=True,
+)
+
+CourseFormSet = forms.formset_factory(
+    CourseForm,
+    extra=1,
 )
