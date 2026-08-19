@@ -97,7 +97,8 @@
 
                 <div id="subject-container">
 
-                    {% for subject_form in subject_formset %}
+                    {% for row in subject_rows %}
+                    {% with subject_form=row.form topic_formset=row.topic_formset %}
 
                     <div class="subject-row border rounded p-3 mb-3">
 
@@ -170,8 +171,89 @@
 
                         </div>
 
+
+                        <!-- Topics -->
+
+                        <div class="mt-3 topic-section">
+
+                            <label class="font-weight-bold">
+                                Topics
+                            </label>
+
+                            {{ topic_formset.management_form }}
+
+                            <div class="topic-container">
+
+                                {% for topic_form in topic_formset %}
+
+                                <div class="topic-row d-flex mb-2">
+
+                                    {{ topic_form.id }}
+
+                                    <div style="display: none;">
+                                        {{ topic_form.DELETE }}
+                                    </div>
+
+                                    {{ topic_form.name }}
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger ml-2 remove-topic">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- Empty Topic Template -->
+
+                            <div
+                                class="topic-empty-form"
+                                style="display: none;">
+
+                                <div class="topic-row d-flex mb-2">
+
+                                    {{ topic_formset.empty_form.id }}
+
+                                    <div style="display: none;">
+                                        {{ topic_formset.empty_form.DELETE }}
+                                    </div>
+
+                                    {{ topic_formset.empty_form.name }}
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger ml-2 remove-topic">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm add-topic">
+
+                                <i class="fas fa-plus"></i>
+                                Add Topic
+
+                            </button>
+
+                        </div>
+
                     </div>
 
+                    {% endwith %}
                     {% endfor %}
 
                 </div>
@@ -237,6 +319,84 @@
                                 </button>
 
                             </div>
+
+                        </div>
+
+
+                        <!-- Topics for new Subject -->
+
+                        <div class="mt-3 topic-section">
+
+                            <label class="font-weight-bold">
+                                Topics
+                            </label>
+
+                            {{ empty_topic_formset.management_form }}
+
+                            <div class="topic-container">
+
+                                {% for topic_form in empty_topic_formset %}
+
+                                <div class="topic-row d-flex mb-2">
+
+                                    {{ topic_form.id }}
+
+                                    <div style="display: none;">
+                                        {{ topic_form.DELETE }}
+                                    </div>
+
+                                    {{ topic_form.name }}
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger ml-2 remove-topic">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <div
+                                class="topic-empty-form"
+                                style="display: none;">
+
+                                <div class="topic-row d-flex mb-2">
+
+                                    {{ empty_topic_formset.empty_form.id }}
+
+                                    <div style="display: none;">
+                                        {{ empty_topic_formset.empty_form.DELETE }}
+                                    </div>
+
+                                    {{ empty_topic_formset.empty_form.name }}
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger ml-2 remove-topic">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm add-topic">
+
+                                <i class="fas fa-plus"></i>
+                                Add Topic
+
+                            </button>
 
                         </div>
 
@@ -343,8 +503,168 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
+            const addedRow =
+                subjectContainer.lastElementChild;
+
+            const topicSection =
+                addedRow.querySelector(".topic-section");
+
+            if (topicSection) {
+
+                const topicFields =
+                    topicSection.querySelectorAll(
+                        'input[name^="topics-"]'
+                    );
+
+                topicFields.forEach(function (field) {
+
+                    field.name =
+                        field.name.replace(
+                            /^topics-\d+-/,
+                            `topics-${formCount}-`
+                        );
+
+                    if (field.id) {
+                        field.id =
+                            field.id.replace(
+                                /^id_topics-\d+-/,
+                                `id_topics-${formCount}-`
+                            );
+                    }
+
+                });
+
+            }
+
+
             subjectTotalForms.value =
                 formCount + 1;
+
+        }
+    );
+
+
+    /*
+     * ADD MORE TOPIC
+     */
+
+    subjectContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const addButton =
+                event.target.closest(".add-topic");
+
+            if (!addButton) {
+                return;
+            }
+
+
+            const subjectRow =
+                addButton.closest(".subject-row");
+
+            const topicSection =
+                addButton.closest(".topic-section");
+
+            const topicContainer =
+                topicSection.querySelector(".topic-container");
+
+            const topicEmptyForm =
+                topicSection.querySelector(".topic-empty-form");
+
+            const totalForms =
+                topicSection.querySelector(
+                    'input[name$="-TOTAL_FORMS"]'
+                );
+
+
+            const formCount =
+                parseInt(totalForms.value);
+
+
+            let newTopic =
+                topicEmptyForm.innerHTML;
+
+
+            newTopic =
+                newTopic.replace(
+                    /__prefix__/g,
+                    formCount
+                );
+
+
+            topicContainer.insertAdjacentHTML(
+                "beforeend",
+                newTopic
+            );
+
+
+            totalForms.value =
+                formCount + 1;
+
+        }
+    );
+
+
+    /*
+     * DELETE TOPIC
+     */
+
+    subjectContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const deleteButton =
+                event.target.closest(".remove-topic");
+
+
+            if (!deleteButton) {
+                return;
+            }
+
+
+            const row =
+                deleteButton.closest(".topic-row");
+
+            const deleteField =
+                row.querySelector(
+                    'input[name$="-DELETE"]'
+                );
+
+
+            const idField =
+                row.querySelector(
+                    'input[name$="-id"]'
+                );
+
+
+            /*
+             * Existing Topic
+             */
+
+            if (
+                idField &&
+                idField.value
+            ) {
+
+                if (deleteField) {
+                    deleteField.checked = true;
+                }
+
+                row.style.display = "none";
+
+            }
+
+
+            /*
+             * Newly Added Topic
+             */
+
+            else {
+
+                row.remove();
+
+            }
 
         }
     );
@@ -377,13 +697,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const deleteField =
                 row.querySelector(
-                    'input[name$="-DELETE"]'
+                    'input[name^="subjects-"][name$="-DELETE"]'
                 );
 
 
             const idField =
                 row.querySelector(
-                    'input[name$="-id"]'
+                    'input[name^="subjects-"][name$="-id"]'
                 );
 
 
@@ -396,7 +716,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 idField.value
             ) {
 
-                deleteField.checked = true;
+                if (deleteField) {
+                    deleteField.checked = true;
+                }
 
                 row.style.display = "none";
 

@@ -11,7 +11,7 @@ from django.views.generic import (
     DetailView,
 )
 
-from .models import Student, Course, Subject
+from .models import Student, Course, Subject,Topic
 from .forms import (
     StudentForm,
     EducationDetailFormSet,
@@ -20,7 +20,8 @@ from .forms import (
     CourseForm,
     SubjectForm,    
     SubjectFormSet,
-    CourseFormSet
+    CourseFormSet,
+    TopicFormSet,
 )
 from django.db import transaction
 from .utils import import_students_from_excel
@@ -290,16 +291,20 @@ class CourseCreateView(LoginRequiredMixin, View):
 
                 course = course_form.save()
 
-                # Subjects for this course
+                # -----------------------------
+                # SUBJECTS
+                # -----------------------------
+
+                course_index = course_form.prefix.split("-")[-1]
+
                 subject_formset = SubjectFormSet(
                     request.POST,
                     instance=course,
-                    prefix=f"subjects-{course_form.prefix.split('-')[-1]}"
+                    prefix=f"subjects-{course_index}"
                 )
 
-                if subject_formset.is_valid():
-                    subject_formset.save()
-                else:
+                if not subject_formset.is_valid():
+
                     transaction.set_rollback(True)
 
                     return render(
@@ -310,6 +315,35 @@ class CourseCreateView(LoginRequiredMixin, View):
                             "error": "Please correct the subject details.",
                         }
                     )
+
+                subjects = subject_formset.save()
+
+                # -----------------------------
+                # TOPICS
+                # -----------------------------
+
+                for subject_index, subject in enumerate(subjects):
+
+                    topic_formset = TopicFormSet(
+                        request.POST,
+                        instance=subject,
+                        prefix=f"topics-{course_index}-{subject_index}"
+                    )
+
+                    if not topic_formset.is_valid():
+
+                        transaction.set_rollback(True)
+
+                        return render(
+                            request,
+                            self.template_name,
+                            {
+                                "course_formset": course_formset,
+                                "error": "Please correct the topic details.",
+                            }
+                        )
+
+                    topic_formset.save()
 
         messages.success(
             request,
@@ -331,12 +365,33 @@ class CourseUpdateView(LoginRequiredMixin, View):
             prefix="subjects"
         )
 
+        subject_rows = []
+
+        for index, subject_form in enumerate(subject_formset.forms):
+
+            topic_formset = TopicFormSet(
+                instance=subject_form.instance,
+                prefix=f"topics-{index}"
+            )
+
+            subject_rows.append({
+                "form": subject_form,
+                "topic_formset": topic_formset,
+            })
+
+        # Used by JavaScript when adding a brand-new subject.
+        empty_topic_formset = TopicFormSet(
+            prefix="topics-__prefix__"
+        )
+
         return render(
             request,
             self.template_name,
             {
                 "form": course_form,
                 "subject_formset": subject_formset,
+                "subject_rows": subject_rows,
+                "empty_topic_formset": empty_topic_formset,
                 "course": course,
             }
         )
@@ -355,12 +410,109 @@ class CourseUpdateView(LoginRequiredMixin, View):
             prefix="subjects"
         )
 
-        if course_form.is_valid() and subject_formset.is_valid():
+        # First validate the course and subject formset.
+        course_valid = course_form.is_valid()
+        subjects_valid = subject_formset.is_valid()
+
+        subject_rows = []
+        topic_formsets = []
+        topics_valid = True
+
+        # Build one TopicFormSet for every subject form using the same index
+        # that is used in course_edit.html: topics-0, topics-1, etc.
+        if subjects_valid:
+            for index, subject_form in enumerate(subject_formset.forms):
+
+                # Ignore completely empty extra subject forms.
+                if (
+                    not subject_form.instance.pk
+                    and not subject_form.has_changed()
+                ):
+                    continue
+
+                # If this subject is being deleted, its topics will be removed
+                # automatically because Topic.subject uses CASCADE.
+                if subject_form.cleaned_data.get("DELETE"):
+                    continue
+
+                topic_formset = TopicFormSet(
+                    request.POST,
+                    instance=subject_form.instance,
+                    prefix=f"topics-{index}"
+                )
+
+                topic_formsets.append(
+                    (index, subject_form, topic_formset)
+                )
+
+                subject_rows.append({
+                    "form": subject_form,
+                    "topic_formset": topic_formset,
+                })
+
+                if not topic_formset.is_valid():
+                    topics_valid = False
+
+        else:
+            # Subject validation failed. Rebuild rows so the page can display
+            # the submitted subject data and any submitted topic data.
+            for index, subject_form in enumerate(subject_formset.forms):
+
+                topic_formset = TopicFormSet(
+                    request.POST,
+                    instance=subject_form.instance,
+                    prefix=f"topics-{index}"
+                )
+
+                subject_rows.append({
+                    "form": subject_form,
+                    "topic_formset": topic_formset,
+                })
+
+        if course_valid and subjects_valid and topics_valid:
 
             with transaction.atomic():
 
-                course_form.save()
-                subject_formset.save()
+                course = course_form.save()
+
+                # Save/delete subjects one by one so their form index stays
+                # matched with the corresponding TopicFormSet.
+                for index, subject_form in enumerate(subject_formset.forms):
+
+                    # Completely empty extra subject form.
+                    if (
+                        not subject_form.instance.pk
+                        and not subject_form.has_changed()
+                    ):
+                        continue
+
+                    # Delete an existing subject.
+                    if subject_form.cleaned_data.get("DELETE"):
+
+                        if subject_form.instance.pk:
+                            subject_form.instance.delete()
+
+                        continue
+
+                    # Existing or newly added subject.
+                    subject = subject_form.save(commit=False)
+                    subject.course = course
+                    subject.save()
+
+                    if hasattr(subject_form, "save_m2m"):
+                        subject_form.save_m2m()
+
+                    # Find the TopicFormSet belonging to this subject index.
+                    topic_formset = next(
+                        formset
+                        for form_index, _, formset in topic_formsets
+                        if form_index == index
+                    )
+
+                    # For a newly created subject, update the TopicFormSet
+                    # instance before saving its topics.
+                    topic_formset.instance = subject
+                    topic_formset.save()
 
             messages.success(
                 request,
@@ -369,13 +521,21 @@ class CourseUpdateView(LoginRequiredMixin, View):
 
             return redirect("course_list")
 
+        # Re-render the edit page with validation errors and submitted values.
+        empty_topic_formset = TopicFormSet(
+            prefix="topics-__prefix__"
+        )
+
         return render(
             request,
             self.template_name,
             {
                 "form": course_form,
                 "subject_formset": subject_formset,
+                "subject_rows": subject_rows,
+                "empty_topic_formset": empty_topic_formset,
                 "course": course,
+                "error": "Please correct the highlighted details.",
             }
         )
 

@@ -42,6 +42,16 @@ class EducationDetail(models.Model):
         return f"{self.student.name} - {self.qualification}"
 
 
+class Course(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    duration_months = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
+
+
+
 class CourseEnrollment(models.Model):
     STATUS_CHOICES = [
         ("Active", "Active"),
@@ -54,7 +64,11 @@ class CourseEnrollment(models.Model):
         on_delete=models.CASCADE,
         related_name="course_enrollments"
     )
-    course = models.CharField(max_length=100)
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.PROTECT,
+        related_name="enrollments"
+    )
     start_date = models.DateField()
     fee = models.DecimalField(
         max_digits=10,
@@ -67,16 +81,7 @@ class CourseEnrollment(models.Model):
     )
 
     def __str__(self):
-        return f"{self.student.name} - {self.course}"
-
-class Course(models.Model):
-    name = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    duration_months = models.PositiveIntegerField()
-
-    def __str__(self):
-        return self.name
-
+        return f"{self.student.name} - {self.course.name}"
 
 class Subject(models.Model):
     course = models.ForeignKey(
@@ -90,3 +95,14 @@ class Subject(models.Model):
 
     def __str__(self):
         return f"{self.course.name} - {self.name}"
+
+class Topic(models.Model):
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE,
+        related_name="topics"
+    )
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name

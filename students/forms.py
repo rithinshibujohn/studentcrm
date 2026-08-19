@@ -6,7 +6,8 @@ from .models import (
     EducationDetail,
     CourseEnrollment,
     Course,
-    Subject
+    Subject,
+    Topic
 )
 
 
@@ -104,7 +105,7 @@ class CourseEnrollmentForm(forms.ModelForm):
         ]
 
         widgets = {
-            "course": forms.TextInput(
+            "course": forms.Select(
                 attrs={"class": "form-control"}
             ),
             "start_date": forms.DateInput(
@@ -219,3 +220,27 @@ CourseFormSet = forms.formset_factory(
     CourseForm,
     extra=1,
 )
+
+class TopicForm(forms.ModelForm):
+    class Meta:
+        model = Topic
+        fields = [
+            "name",
+        ]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Topic Name",
+                }
+            ),
+        }
+
+TopicFormSet = forms.inlineformset_factory(
+    Subject,
+    Topic,
+    form=TopicForm,
+    extra=1,
+    can_delete=True,
+)  

@@ -130,7 +130,6 @@
                             <div class="row">
 
                                 <div class="col-md-4 mb-3">
-
                                     <label>Subject Name</label>
 
                                     <input
@@ -138,33 +137,25 @@
                                         name="subjects-{{ forloop.counter0 }}-0-name"
                                         class="form-control"
                                         placeholder="Subject Name">
-
                                 </div>
 
-
                                 <div class="col-md-3 mb-3">
-
                                     <label>Start Date</label>
 
                                     <input
                                         type="date"
                                         name="subjects-{{ forloop.counter0 }}-0-start_date"
                                         class="form-control">
-
                                 </div>
 
-
                                 <div class="col-md-3 mb-3">
-
                                     <label>End Date</label>
 
                                     <input
                                         type="date"
                                         name="subjects-{{ forloop.counter0 }}-0-end_date"
                                         class="form-control">
-
                                 </div>
-
 
                                 <div class="col-md-2 d-flex align-items-end mb-3">
 
@@ -181,8 +172,63 @@
 
                             </div>
 
-                        </div>
+                            <!-- TOPICS -->
+                            <!-- Topics Section -->
 
+                            <div class="mt-3">
+
+                                <label class="font-weight-bold">
+                                    Topics
+                                </label>
+
+                                <div
+                                    class="topic-container"
+                                    data-course-index="{{ forloop.counter0 }}"
+                                    data-subject-index="0">
+
+                                    <div class="topic-row d-flex mb-2">
+
+                                        <input
+                                            type="text"
+                                            name="topics-{{ forloop.counter0 }}-0-0-name"
+                                            class="form-control"
+                                            placeholder="Topic Name">
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger ml-2 remove-topic">
+
+                                            <i class="fas fa-trash"></i>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <input
+                                    type="hidden"
+                                    class="topic-total-forms"
+                                    name="topics-{{ forloop.counter0 }}-0-TOTAL_FORMS"
+                                    value="1">
+
+                                <input
+                                    type="hidden"
+                                    name="topics-{{ forloop.counter0 }}-0-INITIAL_FORMS"
+                                    value="0">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm add-topic">
+
+                                    <i class="fas fa-plus"></i>
+                                    Add Topic
+
+                                </button>
+
+                            </div>
+
+                        </div>
                     </div>
 
 
@@ -357,6 +403,58 @@
                                     </button>
 
                                 </div>
+
+                            </div>
+
+                            <!-- Topics -->
+                            <div class="mt-3">
+
+                                <label class="font-weight-bold">Topics</label>
+
+                                <div
+                                    class="topic-container"
+                                    data-course-index="__prefix__"
+                                    data-subject-index="0">
+
+                                    <div class="topic-row d-flex mb-2">
+
+                                        <input
+                                            type="text"
+                                            name="topics-__prefix__-0-0-name"
+                                            class="form-control"
+                                            placeholder="Topic Name">
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger ml-2 remove-topic">
+
+                                            <i class="fas fa-trash"></i>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <input
+                                    type="hidden"
+                                    class="topic-total-forms"
+                                    name="topics-__prefix__-0-TOTAL_FORMS"
+                                    value="1">
+
+                                <input
+                                    type="hidden"
+                                    name="topics-__prefix__-0-INITIAL_FORMS"
+                                    value="0">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm add-topic">
+
+                                    <i class="fas fa-plus"></i>
+                                    Add Topic
+
+                                </button>
 
                             </div>
 
@@ -604,6 +702,60 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     </div>
 
+                    <!-- Topics -->
+                    <div class="mt-3">
+
+                        <label class="font-weight-bold">
+                            Topics
+                        </label>
+
+                        <div
+                            class="topic-container"
+                            data-course-index="${courseIndex}"
+                            data-subject-index="${subjectIndex}">
+
+                            <div class="topic-row d-flex mb-2">
+
+                                <input
+                                    type="text"
+                                    name="topics-${courseIndex}-${subjectIndex}-0-name"
+                                    class="form-control"
+                                    placeholder="Topic Name">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger ml-2 remove-topic">
+
+                                    <i class="fas fa-trash"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <input
+                            type="hidden"
+                            class="topic-total-forms"
+                            name="topics-${courseIndex}-${subjectIndex}-TOTAL_FORMS"
+                            value="1">
+
+                        <input
+                            type="hidden"
+                            name="topics-${courseIndex}-${subjectIndex}-INITIAL_FORMS"
+                            value="0">
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary btn-sm add-topic">
+
+                            <i class="fas fa-plus"></i>
+                            Add Topic
+
+                        </button>
+
+                    </div>
+
                 </div>
 
             `;
@@ -618,6 +770,270 @@ document.addEventListener("DOMContentLoaded", function () {
             totalForms.value =
                 subjectIndex + 1;
 
+        }
+    );
+
+
+
+    /*
+     * FORMSET RENUMBER HELPERS
+     */
+
+    function renumberTopics(subjectRow) {
+
+        const topicContainer =
+            subjectRow.querySelector(".topic-container");
+
+        const totalForms =
+            subjectRow.querySelector(".topic-total-forms");
+
+        if (!topicContainer || !totalForms) {
+            return;
+        }
+
+        const courseIndex =
+            topicContainer.dataset.courseIndex;
+
+        const subjectIndex =
+            topicContainer.dataset.subjectIndex;
+
+        const topicRows =
+            topicContainer.querySelectorAll(".topic-row");
+
+        topicRows.forEach(function (topicRow, topicIndex) {
+
+            const input =
+                topicRow.querySelector('input[name$="-name"]');
+
+            if (input) {
+                input.name =
+                    `topics-${courseIndex}-${subjectIndex}-${topicIndex}-name`;
+            }
+        });
+
+        totalForms.value = topicRows.length;
+    }
+
+
+    function renumberSubjects(courseRow) {
+
+        const subjectContainer =
+            courseRow.querySelector(".subject-container");
+
+        const subjectTotalForms =
+            courseRow.querySelector(".subject-total-forms");
+
+        if (!subjectContainer || !subjectTotalForms) {
+            return;
+        }
+
+        const courseIndex =
+            subjectContainer.dataset.courseIndex;
+
+        const subjectRows =
+            subjectContainer.querySelectorAll(".subject-row");
+
+        subjectRows.forEach(function (subjectRow, subjectIndex) {
+
+            const subjectInputs =
+                subjectRow.querySelectorAll(
+                    'input[name^="subjects-"]'
+                );
+
+            subjectInputs.forEach(function (input) {
+
+                if (input.name.endsWith("-name")) {
+                    input.name =
+                        `subjects-${courseIndex}-${subjectIndex}-name`;
+                }
+
+                if (input.name.endsWith("-start_date")) {
+                    input.name =
+                        `subjects-${courseIndex}-${subjectIndex}-start_date`;
+                }
+
+                if (input.name.endsWith("-end_date")) {
+                    input.name =
+                        `subjects-${courseIndex}-${subjectIndex}-end_date`;
+                }
+            });
+
+            const topicContainer =
+                subjectRow.querySelector(".topic-container");
+
+            if (topicContainer) {
+                topicContainer.dataset.courseIndex = courseIndex;
+                topicContainer.dataset.subjectIndex = subjectIndex;
+            }
+
+            const topicTotal =
+                subjectRow.querySelector(".topic-total-forms");
+
+            if (topicTotal) {
+                topicTotal.name =
+                    `topics-${courseIndex}-${subjectIndex}-TOTAL_FORMS`;
+            }
+
+            const topicInitial =
+                subjectRow.querySelector(
+                    'input[name*="topics-"][name$="-INITIAL_FORMS"]'
+                );
+
+            if (topicInitial) {
+                topicInitial.name =
+                    `topics-${courseIndex}-${subjectIndex}-INITIAL_FORMS`;
+            }
+
+            renumberTopics(subjectRow);
+        });
+
+        subjectTotalForms.value = subjectRows.length;
+        subjectTotalForms.name =
+            `subjects-${courseIndex}-TOTAL_FORMS`;
+
+        const initialForms =
+            courseRow.querySelector(
+                'input[name^="subjects-"][name$="-INITIAL_FORMS"]'
+            );
+
+        if (initialForms) {
+            initialForms.name =
+                `subjects-${courseIndex}-INITIAL_FORMS`;
+        }
+    }
+
+
+    function renumberCourses() {
+
+        const courseRows =
+            courseContainer.querySelectorAll(".course-row");
+
+        courseRows.forEach(function (courseRow, courseIndex) {
+
+            const courseFields =
+                courseRow.querySelectorAll(
+                    '[name^="courses-"]'
+                );
+
+            courseFields.forEach(function (field) {
+
+                field.name =
+                    field.name.replace(
+                        /^courses-\d+-/,
+                        `courses-${courseIndex}-`
+                    );
+
+                if (field.id) {
+                    field.id =
+                        field.id.replace(
+                            /^id_courses-\d+-/,
+                            `id_courses-${courseIndex}-`
+                        );
+                }
+            });
+
+            const subjectContainer =
+                courseRow.querySelector(".subject-container");
+
+            if (subjectContainer) {
+                subjectContainer.dataset.courseIndex = courseIndex;
+            }
+
+            renumberSubjects(courseRow);
+        });
+
+        courseTotalForms.value = courseRows.length;
+    }
+
+
+    /*
+     * ADD MORE TOPIC
+     */
+
+    courseContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const addButton =
+                event.target.closest(".add-topic");
+
+            if (!addButton) {
+                return;
+            }
+
+            const subjectRow =
+                addButton.closest(".subject-row");
+
+            const topicContainer =
+                subjectRow.querySelector(".topic-container");
+
+            const totalForms =
+                subjectRow.querySelector(".topic-total-forms");
+
+            const courseIndex =
+                topicContainer.dataset.courseIndex;
+
+            const subjectIndex =
+                topicContainer.dataset.subjectIndex;
+
+            const topicIndex =
+                parseInt(totalForms.value);
+
+            const topicHTML = `
+                <div class="topic-row d-flex mb-2">
+
+                    <input
+                        type="text"
+                        name="topics-${courseIndex}-${subjectIndex}-${topicIndex}-name"
+                        class="form-control"
+                        placeholder="Topic Name">
+
+                    <button
+                        type="button"
+                        class="btn btn-danger ml-2 remove-topic">
+
+                        <i class="fas fa-trash"></i>
+
+                    </button>
+
+                </div>
+            `;
+
+            topicContainer.insertAdjacentHTML(
+                "beforeend",
+                topicHTML
+            );
+
+            totalForms.value =
+                topicIndex + 1;
+        }
+    );
+
+
+    /*
+     * DELETE TOPIC
+     */
+
+    courseContainer.addEventListener(
+        "click",
+        function (event) {
+
+            const deleteButton =
+                event.target.closest(".remove-topic");
+
+            if (!deleteButton) {
+                return;
+            }
+
+            const subjectRow =
+                deleteButton.closest(".subject-row");
+
+            const topicRow =
+                deleteButton.closest(".topic-row");
+
+            topicRow.remove();
+
+            renumberTopics(subjectRow);
         }
     );
 
@@ -647,7 +1063,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
+            const courseRow =
+                subjectRow.closest(".course-row");
+
             subjectRow.remove();
+
+            renumberSubjects(courseRow);
 
         }
     );
@@ -679,6 +1100,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             courseRow.remove();
+
+            renumberCourses();
 
         }
     );
