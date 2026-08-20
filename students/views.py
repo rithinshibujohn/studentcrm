@@ -168,6 +168,18 @@ class StudentUpdateView(
             prefix="enrollment"
         )
 
+        print("STUDENT ERRORS:", form.errors)
+        print("EDUCATION ERRORS:", education_formset.errors)
+        print(
+            "EDUCATION NON-FORM ERRORS:",
+            education_formset.non_form_errors()
+        )
+        print("ENROLLMENT ERRORS:", enrollment_formset.errors)
+        print(
+            "ENROLLMENT NON-FORM ERRORS:",
+            enrollment_formset.non_form_errors()
+        )
+
         if (
             education_formset.is_valid()
             and enrollment_formset.is_valid()
@@ -414,6 +426,15 @@ class CourseUpdateView(LoginRequiredMixin, View):
         course_valid = course_form.is_valid()
         subjects_valid = subject_formset.is_valid()
 
+        print("COURSE VALID:", course_valid)
+        print("COURSE ERRORS:", course_form.errors)
+        print("SUBJECTS VALID:", subjects_valid)
+        print("SUBJECT ERRORS:", subject_formset.errors)
+        print(
+            "SUBJECT NON-FORM ERRORS:",
+            subject_formset.non_form_errors()
+        )
+
         subject_rows = []
         topic_formsets = []
         topics_valid = True
@@ -441,6 +462,15 @@ class CourseUpdateView(LoginRequiredMixin, View):
                     prefix=f"topics-{index}"
                 )
 
+                print(
+                    f"TOPIC {index} ERRORS:",
+                    topic_formset.errors
+                )
+                print(
+                    f"TOPIC {index} NON-FORM ERRORS:",
+                    topic_formset.non_form_errors()
+                )
+
                 topic_formsets.append(
                     (index, subject_form, topic_formset)
                 )
@@ -462,6 +492,15 @@ class CourseUpdateView(LoginRequiredMixin, View):
                     request.POST,
                     instance=subject_form.instance,
                     prefix=f"topics-{index}"
+                )
+
+                print(
+                    f"TOPIC {index} ERRORS:",
+                    topic_formset.errors
+                )
+                print(
+                    f"TOPIC {index} NON-FORM ERRORS:",
+                    topic_formset.non_form_errors()
                 )
 
                 subject_rows.append({

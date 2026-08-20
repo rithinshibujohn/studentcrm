@@ -8,7 +8,7 @@ class StudentAdmin(admin.ModelAdmin):
         "email",
         "phone",
         "course",
-        "created_at",
+        "created_date",
     )
 
     search_fields = (

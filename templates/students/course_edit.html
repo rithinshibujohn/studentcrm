@@ -102,7 +102,7 @@
 
                     <div class="subject-row border rounded p-3 mb-3">
 
-                        {{ subject_form.id }}
+                        {{ subject_form.subject_id }}
 
                         <div style="display: none;">
                             {{ subject_form.DELETE }}
@@ -188,7 +188,7 @@
 
                                 <div class="topic-row d-flex mb-2">
 
-                                    {{ topic_form.id }}
+                                    {{ topic_form.topic_id }}
 
                                     <div style="display: none;">
                                         {{ topic_form.DELETE }}
@@ -219,7 +219,7 @@
 
                                 <div class="topic-row d-flex mb-2">
 
-                                    {{ topic_formset.empty_form.id }}
+                                    {{ topic_formset.empty_form.topic_id }}
 
                                     <div style="display: none;">
                                         {{ topic_formset.empty_form.DELETE }}
@@ -266,7 +266,7 @@
 
                     <div class="subject-row border rounded p-3 mb-3">
 
-                        {{ subject_formset.empty_form.id }}
+                        {{ subject_formset.empty_form.subject_id }}
 
                         <div style="display: none;">
                             {{ subject_formset.empty_form.DELETE }}
@@ -339,7 +339,7 @@
 
                                 <div class="topic-row d-flex mb-2">
 
-                                    {{ topic_form.id }}
+                                    {{ topic_form.topic_id }}
 
                                     <div style="display: none;">
                                         {{ topic_form.DELETE }}
@@ -368,7 +368,7 @@
 
                                 <div class="topic-row d-flex mb-2">
 
-                                    {{ empty_topic_formset.empty_form.id }}
+                                    {{ empty_topic_formset.empty_form.topic_id }}
 
                                     <div style="display: none;">
                                         {{ empty_topic_formset.empty_form.DELETE }}
@@ -634,7 +634,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const idField =
                 row.querySelector(
-                    'input[name$="-id"]'
+                    'input[type="hidden"][name$="_id"]'
                 );
 
 
@@ -703,7 +703,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const idField =
                 row.querySelector(
-                    'input[name^="subjects-"][name$="-id"]'
+                    'input[name^="subjects-"][name$="-subject_id"]'
                 );
 
 

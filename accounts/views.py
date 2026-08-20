@@ -16,7 +16,7 @@ def dashboard(request):
     context = {
         "student_count": Student.objects.count(),
         "user_count": User.objects.count(),
-        "recent_students": Student.objects.order_by("-created_at")[:5],
+        "recent_students": Student.objects.order_by("-created_date")[:5],
     }
     return render(request, "dashboard.html", context)
 

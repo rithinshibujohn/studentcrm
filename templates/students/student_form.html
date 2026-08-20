@@ -125,7 +125,7 @@
 
                     <div class="education-row border rounded p-3 mb-3">
 
-                        {{ education_form.id }}
+                        {{ education_form.education_detail_id }}
                         <div style="display: none;">
                             {{ education_form.DELETE }}
                         </div>
@@ -182,7 +182,7 @@
                     <div id="education-empty-form" style="display: none;">
                         <div class="education-row border rounded p-3 mb-3">
                     
-                            {{ education_formset.empty_form.id }}
+                            {{ education_formset.empty_form.education_detail_id }}
                     
                             <div style="display: none;">
                                 {{ education_formset.empty_form.DELETE }}
@@ -255,7 +255,7 @@
 
                     <div class="enrollment-row border rounded p-3 mb-3">
 
-                        {{ enrollment_form.id }}
+                        {{ enrollment_form.course_enrollment_id }}
                         <div style="display: none;">
                             {{ enrollment_form.DELETE }}
                         </div>
@@ -313,7 +313,7 @@
                     <div id="enrollment-empty-form" style="display: none;">
                         <div class="enrollment-row border rounded p-3 mb-3">
                     
-                            {{ enrollment_formset.empty_form.id }}
+                            {{ enrollment_formset.empty_form.course_enrollment_id }}
                     
                             <div style="display: none;">
                                 {{ enrollment_formset.empty_form.DELETE }}
@@ -448,7 +448,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const idField =
                 row.querySelector(
-                    'input[name$="-id"]'
+                    'input[type="hidden"][name$="_id"]'
                 );
 
             /*
@@ -543,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const idField =
                 row.querySelector(
-                    'input[name$="-id"]'
+                    'input[type="hidden"][name$="_id"]'
                 );
 
             /*
