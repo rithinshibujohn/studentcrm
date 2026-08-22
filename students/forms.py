@@ -7,7 +7,9 @@ from .models import (
     CourseEnrollment,
     Course,
     Subject,
-    Topic
+    Topic,
+    CertificateTemplate,
+    Certificate,
 )
 
 
@@ -244,3 +246,132 @@ TopicFormSet = forms.inlineformset_factory(
     extra=1,
     can_delete=True,
 )  
+
+
+class CertificateTemplateForm(forms.ModelForm):
+    class Meta:
+        model = CertificateTemplate
+        fields = [
+            "certificate_title",
+            "logo",
+            "organization_name",
+            "certificate_body",
+            "signature_name",
+            "signature_designation",
+            "footer_text",
+        ]
+
+        widgets = {
+            "certificate_title": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Certificate Title",
+                }
+            ),
+            "organization_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Organization Name",
+                }
+            ),
+            "certificate_body": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 8,
+                    "placeholder": "Certificate body",
+                }
+            ),
+            "signature_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Signature Name",
+                }
+            ),
+            "signature_designation": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Designation",
+                }
+            ),
+            "footer_text": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Footer Text",
+                }
+            ),
+        }
+
+class CertificateForm(forms.ModelForm):
+    class Meta:
+        model = Certificate
+
+        fields = [
+            "student",
+            "course_enrollment",
+            "template",
+            "pass_mark",
+        ]
+
+        widgets = {
+            "student": forms.Select(
+                attrs={
+                    "class": "form-control",
+                    "id": "id_student",
+                }
+            ),
+
+            "course_enrollment": forms.Select(
+                attrs={
+                    "class": "form-control",
+                    "id": "id_course_enrollment",
+                }
+            ),
+
+            "template": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+
+            "pass_mark": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter Pass Mark",
+                    "step": "0.01",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["course_enrollment"].queryset = (
+            CourseEnrollment.objects.none()
+        )
+
+        # Form submitted - load enrollments for selected student
+        if "student" in self.data:
+            try:
+                student_id = self.data.get("student")
+
+                if student_id:
+                    self.fields["course_enrollment"].queryset = (
+                        CourseEnrollment.objects.filter(
+                            student_id=student_id
+                        ).select_related("course")
+                    )
+
+            except (ValueError, TypeError):
+                    pass
+
+            # Editing an EXISTING certificate
+        elif (
+                self.instance
+                and not self.instance._state.adding
+                and self.instance.student_id
+            ):
+                self.fields["course_enrollment"].queryset = (
+                    CourseEnrollment.objects.filter(
+                        student_id=self.instance.student_id
+                    ).select_related("course")
+                )

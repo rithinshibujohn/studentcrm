@@ -11,7 +11,7 @@ from django.views.generic import (
     DetailView,
 )
 
-from .models import Student, Course, Subject,Topic
+from .models import CourseEnrollment, Student, Course, Subject,Topic, CertificateTemplate,Certificate
 from .forms import (
     StudentForm,
     EducationDetailFormSet,
@@ -22,12 +22,14 @@ from .forms import (
     SubjectFormSet,
     CourseFormSet,
     TopicFormSet,
+    CertificateTemplateForm,
+    CertificateForm,
 )
 from django.db import transaction
 from .utils import import_students_from_excel
 from .excel_form import ExcelUploadForm
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from .pdf import generate_student_pdf
 from django.db import transaction
 from django.shortcuts import (
@@ -35,7 +37,18 @@ from django.shortcuts import (
     render,
     get_object_or_404,
 )
-
+from django.contrib.auth.decorators import login_required
+from django.views.generic import DetailView
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from io import BytesIO
+from django.template.loader import get_template
+from django.utils.html import escape
+from django.contrib.staticfiles import finders
+from django.conf import settings
+from playwright.sync_api import sync_playwright
+import base64
+import mimetypes
 
 class StudentListView(LoginRequiredMixin, ListView):
     model = Student
@@ -583,3 +596,366 @@ class CourseDeleteView(LoginRequiredMixin, DeleteView):
     model = Course
     template_name = "students/course_confirm_delete.html"
     success_url = reverse_lazy("course_list")
+
+
+class CertificateTemplateListView(LoginRequiredMixin, ListView):
+    model = CertificateTemplate
+    template_name = "students/certificate_template_list.html"
+    context_object_name = "templates"
+
+    def get_queryset(self):
+        return CertificateTemplate.objects.order_by("-created_at")
+
+
+class CertificateTemplateCreateView(LoginRequiredMixin, CreateView):
+    model = CertificateTemplate
+    form_class = CertificateTemplateForm
+    template_name = "students/certificate_template_form.html"
+    success_url = reverse_lazy("certificate_template_list")
+
+class CertificateTemplateUpdateView(LoginRequiredMixin, UpdateView):
+    model = CertificateTemplate
+    form_class = CertificateTemplateForm
+    template_name = "students/certificate_template_form.html"
+    success_url = reverse_lazy("certificate_template_list")
+
+
+class CertificateTemplateDeleteView(LoginRequiredMixin, DeleteView):
+    model = CertificateTemplate
+    template_name = "students/certificate_template_confirm_delete.html"
+    success_url = reverse_lazy("certificate_template_list")
+
+@login_required
+def get_student_enrollments(request):
+    student_id = request.GET.get("student_id")
+
+    if not student_id:
+        return JsonResponse({"enrollments": []})
+
+    enrollments = (
+        CourseEnrollment.objects
+        .filter(student_id=student_id)
+        .select_related("course")
+        .order_by("-created_date")
+    )
+
+    data = []
+
+    for enrollment in enrollments:
+        data.append({
+            "id": str(enrollment.course_enrollment_id),
+            "course_name": enrollment.course.name,
+            "duration_months": enrollment.course.duration_months,
+            "status": enrollment.status,
+        })
+
+    return JsonResponse({
+        "enrollments": data
+    })
+
+class CertificateCreateView(LoginRequiredMixin, CreateView):
+    model = Certificate
+    form_class = CertificateForm
+    template_name = "students/certificate_form.html"
+
+    def form_valid(self, form):
+        certificate = form.save(commit=False)
+
+        certificate.created_by = self.request.user
+        certificate.updated_by = self.request.user
+
+        # First save generates certificate number
+        certificate.save()
+
+        enrollment = certificate.course_enrollment
+        course = enrollment.course
+        template = certificate.template
+
+        # -----------------------------
+        # Replace body placeholders
+        # -----------------------------
+
+        body_content = template.certificate_body
+
+        replacements = {
+            "{{student_name}}": escape(certificate.student.name),
+            "{{course_name}}": escape(course.name),
+            "{{course_duration}}": str(course.duration_months),
+            "{{pass_mark}}": str(certificate.pass_mark),
+            "{{certificate_number}}": certificate.certificate_number,
+        }
+
+        for placeholder, value in replacements.items():
+            body_content = body_content.replace(
+                placeholder,
+                value
+            )
+
+        # -----------------------------
+        # Logo
+        # -----------------------------
+
+        logo_html = ""
+
+        if template.logo:
+            logo_path = template.logo.path
+
+            mime_type, _ = mimetypes.guess_type(logo_path)
+
+            with open(logo_path, "rb") as image_file:
+                encoded_image = base64.b64encode(
+                    image_file.read()
+                ).decode("utf-8")
+
+            logo_src = (
+                f"data:{mime_type};base64,{encoded_image}"
+            )
+
+            logo_html = f"""
+                <p style="text-align:center;">
+                    <img
+                        src="{logo_src}"
+                        style="
+                            max-width:140px;
+                            height:auto;
+                        "
+                    >
+                </p>
+            """
+
+        # -----------------------------
+        # Complete editable certificate
+        # -----------------------------
+
+        complete_content = f"""
+            {logo_html}
+
+            <h2 style="
+                text-align:center;
+                margin:5px 0;
+                font-size:24px;
+            ">
+                {escape(template.organization_name)}
+            </h2>
+
+            <h1 style="
+                text-align:center;
+                margin:15px 0 30px 0;
+                font-size:34px;
+            ">
+                {escape(template.certificate_title)}
+            </h1>
+
+            <div style="
+                font-size:18px;
+                line-height:1.7;
+                text-align:center;
+            ">
+                {body_content}
+            </div>
+
+            <div style="
+                text-align:right;
+                margin-top:50px;
+            ">
+                <p style="
+                    margin:0;
+                    font-weight:bold;
+                ">
+                    {escape(template.signature_name)}
+                </p>
+
+                <p style="margin:0;">
+                    {escape(template.signature_designation)}
+                </p>
+            </div>
+
+            <div style="
+                text-align:center;
+                margin-top:40px;
+                font-size:12px;
+            ">
+                {escape(template.footer_text)}
+            </div>
+        """
+
+        certificate.certificate_content = complete_content
+        certificate.save()
+
+        self.object = certificate
+
+        return redirect(
+            "certificate_edit_content",
+            pk=certificate.pk
+        )
+
+
+class CertificateContentEditView(LoginRequiredMixin, UpdateView):
+    model = Certificate
+    fields = ["certificate_content"]
+    template_name = "students/certificate_content_edit.html"
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "certificate_preview",
+            kwargs={"pk": self.object.pk}
+        )
+
+class CertificatePreviewView(LoginRequiredMixin, DetailView):
+    model = Certificate
+    template_name = "students/certificate_preview.html"
+    context_object_name = "certificate"
+
+    
+def certificate_pdf_download(request, pk):
+
+    certificate = get_object_or_404(
+        Certificate,
+        pk=pk
+    )
+
+    template = get_template(
+        "students/certificate_pdf.html"
+    )
+
+    html = template.render({
+        "certificate": certificate
+    })
+
+    result = BytesIO()
+
+    pdf = pisa.CreatePDF(
+        html,
+        dest=result,
+        encoding="UTF-8",
+        link_callback=link_callback
+    )
+
+    if pdf.err:
+
+        return HttpResponse(
+            "Error generating certificate PDF.",
+            status=500
+        )
+
+    student_name = (
+        certificate.student.name
+        .strip()
+        .replace(" ", "_")
+    )
+
+    year = certificate.issued_date.year
+
+    filename = (
+        f"Certificate_{student_name}_{year}.pdf"
+    )
+
+    response = HttpResponse(
+        result.getvalue(),
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="{filename}"'
+    )
+
+    return response
+
+
+def link_callback(uri, rel):
+
+    # Media files
+    if uri.startswith(settings.MEDIA_URL):
+
+        path = os.path.join(
+            settings.MEDIA_ROOT,
+            uri.replace(settings.MEDIA_URL, "")
+        )
+
+        return path
+
+    # Static files
+    if uri.startswith(settings.STATIC_URL):
+
+        relative_path = uri.replace(
+            settings.STATIC_URL,
+            ""
+        )
+
+        path = finders.find(relative_path)
+
+        if path:
+            return path
+
+    return uri
+
+
+def certificate_pdf_download(request, pk):
+    certificate = get_object_or_404(
+        Certificate,
+        pk=pk
+    )
+
+    html_content = render_to_string(
+        "students/certificate_pdf.html",
+        {
+            "certificate": certificate,
+            "base_url": request.build_absolute_uri("/"),
+        }
+    )
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+
+        page = browser.new_page(
+            viewport={
+                "width": 1120,
+                "height": 790
+            }
+        )
+
+        page.set_content(
+            html_content,
+            wait_until="networkidle"
+        )
+
+        # Use browser/screen styling
+        page.emulate_media(media="screen")
+
+        pdf_bytes = page.pdf(
+            format="A4",
+            landscape=True,
+            print_background=True,
+            margin={
+                "top": "0mm",
+                "right": "0mm",
+                "bottom": "0mm",
+                "left": "0mm",
+            },
+            prefer_css_page_size=True,
+        )
+
+        browser.close()
+
+    student_name = (
+        certificate.student.name
+        .strip()
+        .replace(" ", "_")
+    )
+
+    year = certificate.issued_date.year
+
+    filename = (
+        f"Certificate_{student_name}_{year}.pdf"
+    )
+
+    response = HttpResponse(
+        pdf_bytes,
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="{filename}"'
+    )
+
+    return response

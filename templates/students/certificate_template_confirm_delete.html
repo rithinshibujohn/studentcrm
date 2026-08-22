@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <h1 class="h3 mb-4 text-gray-800">
+        Delete Certificate Template
+    </h1>
+
+    <div class="card shadow mb-4">
+
+        <div class="card-body">
+
+            <p>
+                Are you sure you want to delete
+                <strong>{{ object.certificate_title }}</strong>?
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="btn btn-danger">
+                    Delete
+                </button>
+
+                <a href="{% url 'certificate_template_list' %}"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 297mm;
+            height: 210mm;
+            font-family: Arial, sans-serif;
+            background: white;
+        }
+
+        .certificate-page {
+            width: 297mm;
+            height: 210mm;
+
+            padding: 15mm 18mm;
+
+            border: 10px double #333;
+
+            overflow: hidden;
+
+            background: white;
+        }
+
+        .certificate-page img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .certificate-page table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .certificate-page td,
+        .certificate-page th {
+            border: 1px solid #444;
+            padding: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="certificate-page">
+
+    {{ certificate.certificate_content|safe }}
+
+</div>
+
+</body>
+</html>

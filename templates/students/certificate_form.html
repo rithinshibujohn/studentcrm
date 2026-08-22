@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <h1 class="h3 mb-4 text-gray-800">
+        Generate Certificate
+    </h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+
+            <form method="post" id="certificateForm">
+                {% csrf_token %}
+
+                <!-- Student -->
+                <div class="form-group">
+                    <label>Select Student</label>
+
+                    {{ form.student }}
+
+                    {% for error in form.student.errors %}
+                        <small class="text-danger d-block">
+                            {{ error }}
+                        </small>
+                    {% endfor %}
+                </div>
+
+
+                <!-- Course Enrollment -->
+                <div class="form-group">
+                    <label>Course</label>
+
+                    {{ form.course_enrollment }}
+
+                    {% for error in form.course_enrollment.errors %}
+                        <small class="text-danger d-block">
+                            {{ error }}
+                        </small>
+                    {% endfor %}
+                </div>
+
+
+                <!-- Course Name -->
+                <div class="form-group">
+                    <label>Course Name</label>
+
+                    <input
+                        type="text"
+                        id="course_name"
+                        class="form-control"
+                        readonly
+                    >
+                </div>
+
+
+                <!-- Duration -->
+                <div class="form-group">
+                    <label>Course Duration</label>
+
+                    <input
+                        type="text"
+                        id="course_duration"
+                        class="form-control"
+                        readonly
+                    >
+                </div>
+
+
+                <!-- Template -->
+                <div class="form-group">
+                    <label>Certificate Template</label>
+
+                    {{ form.template }}
+
+                    {% for error in form.template.errors %}
+                        <small class="text-danger d-block">
+                            {{ error }}
+                        </small>
+                    {% endfor %}
+                </div>
+
+
+                <!-- Pass Mark -->
+                <div class="form-group">
+                    <label>Pass Mark</label>
+
+                    {{ form.pass_mark }}
+
+                    {% for error in form.pass_mark.errors %}
+                        <small class="text-danger d-block">
+                            {{ error }}
+                        </small>
+                    {% endfor %}
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">
+                    Continue
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const studentSelect =
+        document.getElementById("id_student");
+
+    const enrollmentSelect =
+        document.getElementById("id_course_enrollment");
+
+    const courseName =
+        document.getElementById("course_name");
+
+    const courseDuration =
+        document.getElementById("course_duration");
+
+
+    // -----------------------------
+    // Student changed
+    // -----------------------------
+
+    studentSelect.addEventListener("change", function () {
+
+        const studentId = this.value;
+
+        // Reset fields
+        enrollmentSelect.innerHTML =
+            '<option value="">---------</option>';
+
+        courseName.value = "";
+        courseDuration.value = "";
+
+
+        if (!studentId) {
+            return;
+        }
+
+
+        const url =
+            "{% url 'get_student_enrollments' %}" +
+            "?student_id=" +
+            encodeURIComponent(studentId);
+
+
+        fetch(url)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                data.enrollments.forEach(function (enrollment) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = enrollment.id;
+
+                    option.textContent =
+                        enrollment.course_name +
+                        " (" +
+                        enrollment.status +
+                        ")";
+
+                    option.dataset.courseName =
+                        enrollment.course_name;
+
+                    option.dataset.duration =
+                        enrollment.duration_months;
+
+                    enrollmentSelect.appendChild(option);
+
+                });
+
+
+                // If student has only one enrollment,
+                // automatically select it.
+
+                if (data.enrollments.length === 1) {
+
+                    enrollmentSelect.selectedIndex = 1;
+
+                    updateCourseDetails();
+                }
+
+            })
+
+            .catch(error => {
+                console.error(
+                    "Error loading enrollments:",
+                    error
+                );
+            });
+
+    });
+
+
+    // -----------------------------
+    // Enrollment changed
+    // -----------------------------
+
+    enrollmentSelect.addEventListener(
+        "change",
+        updateCourseDetails
+    );
+
+
+    function updateCourseDetails() {
+
+        const selectedOption =
+            enrollmentSelect.options[
+                enrollmentSelect.selectedIndex
+            ];
+
+
+        if (!selectedOption || !selectedOption.value) {
+
+            courseName.value = "";
+            courseDuration.value = "";
+
+            return;
+        }
+
+
+        courseName.value =
+            selectedOption.dataset.courseName || "";
+
+
+        const duration =
+            selectedOption.dataset.duration;
+
+
+        if (duration) {
+
+            courseDuration.value =
+                duration + " Months";
+
+        } else {
+
+            courseDuration.value = "";
+
+        }
+
+    }
+
+});
+</script>
+
+{% endblock %}

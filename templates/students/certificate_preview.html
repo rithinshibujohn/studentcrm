@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    .certificate-preview-wrapper {
+        overflow-x: auto;
+        padding: 20px 0;
+    }
+
+    .certificate-page {
+        width: 1120px;
+        min-height: 790px;
+
+        margin: 0 auto;
+
+        background: #ffffff;
+
+        border: 10px double #333333;
+
+        box-sizing: border-box;
+
+        padding: 50px 70px;
+
+        font-family: Arial, sans-serif;
+    }
+
+    .certificate-page img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .certificate-page table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .certificate-page table td,
+    .certificate-page table th {
+        border: 1px solid #444;
+        padding: 6px;
+    }
+
+</style>
+
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h1 class="h3 mb-0 text-gray-800">
+            Certificate Preview
+        </h1>
+
+        <div>
+
+            <a
+                href="{% url 'certificate_edit_content' certificate.pk %}"
+                class="btn btn-warning"
+            >
+                Edit Certificate
+            </a>
+
+            <a
+                href="{% url 'certificate_pdf_download' certificate.pk %}"
+                class="btn btn-success"
+            >
+                Download PDF
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="certificate-preview-wrapper">
+
+        <div class="certificate-page">
+
+            {{ certificate.certificate_content|safe }}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

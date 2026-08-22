@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            Certificate Templates
+        </h1>
+
+        <a href="{% url 'certificate_template_add' %}"
+           class="btn btn-primary">
+            Add Certificate Template
+        </a>
+        <a href="{% url 'certificate_generate' %}"
+           class="btn btn-success">
+            Generate Certificate
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th>Certificate Title</th>
+                            <th>Organization</th>
+                            <th>Signature</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for template in templates %}
+
+                        <tr>
+                            <td>{{ template.certificate_title }}</td>
+
+                            <td>
+                                {{ template.organization_name }}
+                            </td>
+
+                            <td>
+                                {{ template.signature_name }}
+                            </td>
+
+                            <td>
+                                {{ template.created_at|date:"d-m-Y" }}
+                            </td>
+                            <td>
+                                <a href="{% url 'certificate_template_edit' template.pk %}"
+                                class="btn btn-sm btn-warning">
+                                    Edit
+                                </a>
+
+                                <a href="{% url 'certificate_template_delete' template.pk %}"
+                                class="btn btn-sm btn-danger">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                No certificate templates found.
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
